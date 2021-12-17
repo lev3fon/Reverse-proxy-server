@@ -1,0 +1,9 @@
+{
+  "postgres": {
+    "host": "172.17.0.1",
+    "port": "8765",
+    "name": "postgres",
+    "password": "12345",
+    "username": "postgres"
+  }
+}
