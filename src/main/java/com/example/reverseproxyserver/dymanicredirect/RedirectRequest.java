@@ -12,22 +12,23 @@ import java.net.URL;
 
 public class RedirectRequest {
     public RedirectRequest(HttpExchange exchange, String nextRequestUrl) throws IOException {
-        URL url = new URL(nextRequestUrl);
+        URL url = new URL(nextRequestUrl + "/");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod(exchange.getRequestMethod());
-        // setting up headers
         exchange.getRequestHeaders().forEach((headerName, headersValue) -> {
             if (headersValue.isEmpty()) {
                 return;
             }
             connection.setRequestProperty(headerName, headersValue.get(0));
         });
-        connection.setDoOutput(true);
+        connection.setRequestMethod(exchange.getRequestMethod());
 
-        String requestBody = exchange.getRequestBody().toString();
-        try(OutputStream os = connection.getOutputStream()) {
-            byte[] input = requestBody.getBytes();
-            os.write(input, 0, input.length);
+        if (exchange.getRequestMethod().equals("POST")) {
+            connection.setDoOutput(true);
+            String requestBody = exchange.getRequestBody().toString();
+            try(OutputStream os = connection.getOutputStream()) {
+                byte[] input = requestBody.getBytes();
+                os.write(input, 0, input.length);
+            }
         }
 
         int status = connection.getResponseCode();
